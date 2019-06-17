@@ -48,5 +48,6 @@ if __name__ == "__main__":
         raw_input("Press ENTER to start changing servo angle.")
         result = change_servo(angle)
         
-        rospy.loginfo('Desired goal has been reached, servo angle is now: %i degrees.', result.ActualServoAngle)
+        rospy.loginfo('Desired goal has been reached, ready to take new order.')
+
         

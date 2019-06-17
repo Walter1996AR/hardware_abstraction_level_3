@@ -31,53 +31,41 @@ class ServoAction(object):
             rospy.loginfo('requested angle is bigger, I need to add:%i.'%angle)
             rospy.loginfo('Servo needs to move:%i degrees.'%delta_angle)
             #adding value until desired angle has been reached
-            for i in range(1, delta_angle+1):
+            valueToAdd = 1 
 
-                # Check that preempt has not been requested by the client
-                # If yes, kill the action 
-                if self.server.is_preempt_requested():
-                    rospy.loginfo('Preempted')
-                    self.server.set_preempted()
-                    success = False
-                    break
-
-                time.sleep(0.1) #small delay to increase servo control 
-
-                current_angle += 1 # the current angle is changed with 1 degree every loop
-                self.feedback.percentage = round(float((current_angle/180.0)*100)) #percentage of the angle 
-                self.server.publish_feedback(self.feedback)
-                rospy.loginfo ('percentage of current servo angle = %i'%self.feedback.percentage)
-                
-                
-                
-        
-        negative_angle = delta_angle * -1   #need to Invert this value because its negative
-
-        if (current_angle >= angle):
-            
+        else:
+            delta_angle = delta_angle * -1  #need to invert this value because its negative if the angle is smaller
             rospy.loginfo('requested angle is smaller, I need to substract %i.'%angle)
-            rospy.loginfo('Servo needs to move:%i degrees.'%negative_angle)
-        
-            for i in range(1, negative_angle+1 ):
+            rospy.loginfo('Servo needs to move:%i degrees.'%delta_angle) 
+            valueToAdd = -1 # For loop needs to substract value from the current value
 
-                # Check that preempt has not been requested by the client
-                # If yes, kill the action 
-                if self.server.is_preempt_requested():
-                    rospy.loginfo('Preempted')
-                    self.server.set_preempted()
-                    success = False
-                    break
 
-                current_angle -= 1
-                self.feedback.percentage = round(float((current_angle / 180.0)*100))
-                rospy.loginfo('percentage of current servo angle = %i'%self.feedback.percentage)
-                self.server.publish_feedback(self.feedback)
-                time.sleep(0.1)
 
-        if success:
+
+        for i in range(1, delta_angle+1):
+
+            # Check that preempt has not been requested by the client
+            # If yes, kill the action 
+            if self.server.is_preempt_requested():
+                rospy.loginfo('Preempted')
+                self.server.set_preempted()
+                success = False
+                break
+
+            time.sleep(0.1) #small delay to increase servo control 
+
+            current_angle += valueToAdd # the current angle is changed with 1 degree every loop
+            rospy.loginfo("The current angle is: %i ", current_angle)
+            self.feedback.percentage = round(float((current_angle/180.0)*100)) #percentage of the angle 
+            self.server.publish_feedback(self.feedback)
+            rospy.loginfo ('percentage of current servo angle = %i'%self.feedback.percentage)
+            success = True
+                
+        if success is True:
             rospy.loginfo('State is now succeeded')
             self.server.set_succeeded(self.result)
             self.result.ActualServoAngle = (current_angle)
+        
             rospy.loginfo('result is = %i', self.result.ActualServoAngle)
 
         rospy.loginfo('Angle reached: ready to change angle again.')

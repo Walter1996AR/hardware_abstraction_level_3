@@ -5,11 +5,13 @@ import rospy
 
 # Here's your service callback function
 def handle_check_levels(req):
+
+    # Check if enough levels have been reached, total should be greather than 11. 
     print 'request received to check if enough levels are reached'
-    if req.Ros + req.Vision + req.PrinciplesOfRobotics + req.Safety + req.HardwareAbstraction >= 10:
+    if req.Ros + req.Vision + req.PrinciplesOfRobotics + req.Safety + req.HardwareAbstraction >= 11:
         message = "Levels have been reached, Congrats!"
     else:
-        message = "levels are not reached yet, please hurry!!"
+        message = "levels are not reached yet, please hurry!"
     return PointsReachedResponse(message)
 
 
